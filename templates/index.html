@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bitcount+Grid+Double+Ink:wght@100..900&family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=Fruktur:ital@0;1&family=Lobster+Two:ital,wght@0,400;0,700;1,400;1,700&family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&display=swap" rel="stylesheet">
+    <title>Weather App</title>
+    <body>
+        
+    <img src="bb.jpg" alt="">
+
+    <h1 class="lobster-two-bold">⛅ WEATHER</h1>
+    <p class="subtitle">REAL TIME FORECAST</p>
+
+    <div class="form-wrapper">
+        <form method="POST" id="weatherForm">
+            <div class="city-inputs" id="cityInputs">
+                <div class="city-row">
+                    <span class="city-label">City 1</span>
+                    <input type="text" name="city" placeholder="Enter city name..." required>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button type="button" class="add-btn" id="addBtn" onclick="addCity()">+ Add City</button>
+                <button type="submit" class="search-btn">Search</button>
+            </div>
+        </form>
+
+        {% if error %}
+            <p class="error">⚠ {{ error }}</p>
+        {% endif %}
+    </div>
+
+    {% if weather %}
+    <div class="single-result">
+        <div class="result-header">
+            <h2>{{ weather.city }}</h2>
+            <p>{{ weather.desc }}</p>
+        </div>
+        <div class="result-grid">
+            <div class="result-item">
+                <div class="label">Temperature</div>
+                <div class="value">{{ weather.temp }}°C</div>
+            </div>
+            <div class="result-item">
+                <div class="label">Humidity</div>
+                <div class="value">{{ weather.humidity }}%</div>
+            </div>
+            <div class="result-item">
+                <div class="label">Wind Speed</div>
+                <div class="value">{{ weather.wind }} m/s</div>
+            </div>
+            <div class="result-item">
+                <div class="label">Condition</div>
+                <div class="value" style="font-size:15px; text-transform:capitalize;">{{ weather.desc }}</div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if summary %}
+    <div class="summary">
+        <p class="summary-title">Weather Summary</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>City</th>
+                    <th>Temperature</th>
+                    <th>Weather</th>
+                    <th>Humidity</th>
+                    <th>Wind Speed</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for w in summary %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ w.city }}</td>
+                    <td>{{ w.temp }}°C</td>
+                    <td style="text-transform:capitalize;">{{ w.desc }}</td>
+                    <td>{{ w.humidity }}%</td>
+                    <td>{{ w.wind }} m/s</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <script>
+        let cityCount = 1;
+        const maxCities = 4;
+
+        function addCity() {
+            if (cityCount >= maxCities) {
+                alert('Maximum 4 cities allowed!');
+                return;
+            }
+            cityCount++;
+            const container = document.getElementById('cityInputs');
+            const row = document.createElement('div');
+            row.className = 'city-row';
+            row.innerHTML = `
+                <span class="city-label">City ${cityCount}</span>
+                <input type="text" name="city" placeholder="Enter city name..." required>
+                <button type="button" class="remove-btn" onclick="removeCity(this)">×</button>
+            `;
+            container.appendChild(row);
+
+            if (cityCount >= maxCities) {
+                document.getElementById('addBtn').style.opacity = '0.3';
+                document.getElementById('addBtn').style.pointerEvents = 'none';
+            }
+        }
+
+        function removeCity(btn) {
+            btn.parentElement.remove();
+            cityCount--;
+            document.querySelectorAll('.city-label').forEach((label, i) => {
+                label.textContent = `City ${i + 1}`;
+            });
+            document.getElementById('addBtn').style.opacity = '1';
+            document.getElementById('addBtn').style.pointerEvents = 'auto';
+        }
+    </script>
+
+</body>
+    <style>
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        .lobster-two-bold {
+            font-family: "Lobster Two", sans-serif;
+            font-weight: 700;
+            font-style: normal;
+        }
+
+        body {
+            font-family: "Lobster Two", sans-serif;
+            min-height: 100vh;
+            color: black;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 60px 20px;
+            background-image: url('/static/bb.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        h1 {
+            font-family: "Lobster Two", sans-serif;
+            font-weight: 700;
+            font-style: normal;
+            font-size: 75px;
+            letter-spacing: 6px;
+            color: #FFFF00;
+
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #FFFFFF;
+
+            font-size: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 50px;
+            font-weight: bold;
+            font-family: "Lobster Two", sans-serif;
+        }
+
+        .form-wrapper {
+            width: 100%;
+            max-width: 560px;
+        }
+
+        .city-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding-right: 15px;
+            margin-bottom: 16px;
+        }
+
+        .city-row {
+            display: flex;
+            align-items: center;
+            padding-right: 15px;
+            gap: 10px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .city-label {
+            font-size: 18px;
+            letter-spacing: 2px;
+            color: white;
+            text-transform: uppercase;
+            width: 50px;
+            flex-shrink: 0;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 14px 18px;
+            font-size: 18px;
+            font-family: "Lobster Two", sans-serif;
+            background: white;
+            border: 1px solid #2a2a35;
+            border-radius: 8px;
+            color: black;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #6cf183;
+        }
+
+        input[type="text"]::placeholder { color: #444; }
+
+        .remove-btn {
+            background: none;
+            border: 1px solid white;
+            color: yellow;
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .remove-btn:hover { border-color: #ff6a6a; color: #ff6a6a; }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .add-btn {
+            flex: 1;
+            padding: 13px;
+            background: transparent;
+            border: 1px dashed white;
+            border-radius: 8px;
+            color: white;
+            font-family: "Lobster Two", sans-serif;
+            font-size: 18px;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .add-btn:hover { border-color: #7c6aff; color: yellow; }
+
+        .search-btn {
+            flex: 2;
+            padding: 13px;
+            background: #6bf1e1;
+            border: none;
+            border-radius: 8px;
+            color: black;
+            font-family: "Lobster Two", sans-serif;
+            font-size: 18px;
+            font-weight: 500;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .search-btn:hover { background: #44d1bc; }
+
+        .error {
+            color: #ff6a6a;
+            font-size: 13px;
+            text-align: center;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
+
+        .single-result {
+            width: 100%;
+            max-width: 560px;
+            border: 1px solid #2a2a35;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #141418;
+        }
+
+        .result-header {
+            background: #7c6aff;
+            padding: 20px 24px;
+        }
+
+        .result-header h2 {
+            font-family: "Lobster Two", sans-serif;
+            font-weight: 700;
+            font-size: 36px;
+            letter-spacing: 3px;
+        }
+
+        .result-header p {
+            font-size: 13px;
+            opacity: 0.8;
+            text-transform: capitalize;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1px;
+            background: #2a2a35;
+        }
+
+        .result-item {
+            background: #141418;
+            padding: 20px 24px;
+        }
+
+        .result-item .label {
+            font-size: 10px;
+            letter-spacing: 2px;
+            color: white;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .result-item .value {
+            font-size: 22px;
+            font-weight: 500;
+            color: #f0f0f0;
+        }
+
+        .summary {
+            width: 100%;
+            max-width: 760px;
+        }
+
+        .summary-title {
+            font-family: "Lobster Two", sans-serif;
+            font-weight: 700;
+            font-size: 32px;
+            letter-spacing: 4px;
+            color: white;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #141418;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #2a2a35;
+        }
+
+        thead tr {
+            background: #1e1e28;
+        }
+
+        th {
+            padding: 14px 18px;
+            text-align: left;
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #cff14a;
+            font-weight: 500;
+            border-bottom: 1px solid #2a2a35;
+        }
+
+        td {
+            padding: 14px 18px;
+            font-size: 14px;
+            color: #f5efef;
+            border-bottom: 1px solid #1a1a22;
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: black; }
+
+        td:first-child { color: white; font-size: 12px; }
+        td:nth-child(2) { color: #f0f0f0; font-weight: 500; }
+    </style>
+</head>
+
+</html>
